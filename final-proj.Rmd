@@ -18,11 +18,11 @@ library(tidyverse)
 #   filter(STATEFIP == 8) %>%
 #   select(-c(SAMPLE, SERIAL, CBSERIAL))
 # 
-# write.csv(data, "colorado_housing.csv")
+#  write.csv(data, "colorado_housing_data.csv")
 ```
 
 ## LOAD DATA
 ```{r}
-data <- read.csv("colorado_housing.csv")
+data <- read.csv("colorado_housing_data.csv")
 ```
 

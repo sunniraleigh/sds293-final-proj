@@ -11,12 +11,18 @@ library(tidyverse)
 ```
 
 ```{r}
-ddi <- read_ipums_ddi("usa_00005.xml")
-data <- read_ipums_micro(ddi)
+# ddi <- read_ipums_ddi("usa_00005.xml")
+# data <- read_ipums_micro(ddi)
+# 
+# data <- data %>%
+#   filter(STATEFIP == 8) %>%
+#   select(-c(SAMPLE, SERIAL, CBSERIAL))
+# 
+# write.csv(data, "colorado_housing.csv")
+```
 
-data <- data %>%
-  filter(STATEFIP == 8)
-
-write.csv(data, "colorado_housing.csv")
+## LOAD DATA
+```{r}
+data <- read.csv("colorado_housing.csv")
 ```
 

@@ -5,4 +5,18 @@ date: "4/10/2022"
 output: html_document
 ---
 
+```{r}
+library(ipumsr)
+library(tidyverse)
+```
+
+```{r}
+ddi <- read_ipums_ddi("usa_00005.xml")
+data <- read_ipums_micro(ddi)
+
+data <- data %>%
+  filter(STATEFIP == 8)
+
+write.csv(data, "colorado_housing.csv")
+```
 

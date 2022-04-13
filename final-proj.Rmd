@@ -26,3 +26,69 @@ library(tidyverse)
 data <- read.csv("colorado_housing_data.csv")
 ```
 
+
+##QUESTION 
+What are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
+
+##PART 1: EXPLORATORY DATA ANALYSIS
+
+```{r}
+library(ggplot2)
+ggplot(data) + geom_point(aes(x=VETSTAT, y= FOODSTMP))
+```
+
+
+##LOGISTIC REGRESSION
+
+```{r}
+
+data <- data %>%
+      mutate(FOODSTMP = ifelse(FOODSTMP == 1,0,1))
+
+glm_fit = glm(FOODSTMP~.,
+              data = data,
+              family = binomial)
+summary(glm_fit)
+```
+
+```{r}
+glm_probs = data.frame(probs = predict(glm_fit, type="response"))
+head(glm_probs)
+```
+
+```{r}
+train = data %>%
+  dplyr::sample_frac(0.8)
+
+test = data %>%
+  anti_join(train)
+```
+```{r}
+glm_2 = glm(FOODSTMP~.,
+              data = train, family = binomial)
+summary(glm_2)
+```
+
+```{r}
+glm_probs2 = data.frame(probs = predict(glm_2, newdata = test, type="response"))
+head(glm_probs2)
+```
+
+```{r}
+#create probabilities
+
+glm_pred = glm_probs2 %>%
+  mutate(pred = ifelse(probs>.5, "No", "Yes"))
+
+glm_pred = cbind(test, glm_pred)
+
+glm_pred %>% 
+  count(pred, FOODSTMP) %>%
+  spread(FOODSTMP, n, fill = 0)
+
+glm_pred %>%
+  summarize(score = mean(pred == FOODSTMP))
+```
+
+##CROSS VALIDATION TO SUBSET PREDICTORS
+

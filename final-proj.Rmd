@@ -30,18 +30,30 @@ data <- read.csv("colorado_housing_data.csv")
 ##QUESTION 
 What are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
 
+Which variables will predict the likelihood of someone receiving food stamps or not in Colorado?
+
+Questions for Sanogo:
+- We're interested in tree and logit regression for models, what are some other models we could use for classification?  
+- What are all the model choosing methods we could use? We were thinking of using CV and lasso. Tuning for trees?
+- Feedback on research question.
+
 ##PART 1: EXPLORATORY DATA ANALYSIS
 
 ```{r}
 library(ggplot2)
-ggplot(data) + geom_point(aes(x=VETSTAT, y= FOODSTMP))
+# ggplot(data, aes(x = VETSTAT, y = FOODSTMP)) + geom_point()
+# 
+# ggplot(data, aes(x = RENT, y = FOODSTMP, color =  VETSTAT)) +
+#   geom_point()
+
+ggplot(data, aes(group = RENT, x = FOODSTMP, y = RENT)) +
+  geom_boxplot()
 ```
 
 
 ##LOGISTIC REGRESSION
 
 ```{r}
-
 data <- data %>%
       mutate(FOODSTMP = ifelse(FOODSTMP == 1,0,1))
 
@@ -57,12 +69,15 @@ head(glm_probs)
 ```
 
 ```{r}
+set.seed(1)
+
 train = data %>%
   dplyr::sample_frac(0.8)
 
 test = data %>%
   anti_join(train)
 ```
+
 ```{r}
 glm_2 = glm(FOODSTMP~.,
               data = train, family = binomial)

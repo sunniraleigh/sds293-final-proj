@@ -5,7 +5,7 @@ date: "4/10/2022"
 output: html_document
 ---
 
-```{r}
+```{r include=FALSE}
 library(ipumsr)
 library(tidyverse)
 ```
@@ -23,7 +23,8 @@ library(tidyverse)
 
 ## LOAD DATA
 ```{r}
-data <- read.csv("colorado_housing_data.csv")
+data <- read.csv("colorado_housing_data.csv") %>%
+  mutate(FOODSTMP = ifelse(FOODSTMP == 1, 0, 1))
 ```
 
 
@@ -40,13 +41,25 @@ Questions for Sanogo:
 ##PART 1: EXPLORATORY DATA ANALYSIS
 
 ```{r}
-library(ggplot2)
-# ggplot(data, aes(x = VETSTAT, y = FOODSTMP)) + geom_point()
-# 
-# ggplot(data, aes(x = RENT, y = FOODSTMP, color =  VETSTAT)) +
-#   geom_point()
+ggplot(data, aes(x = FOODSTMP)) +
+  geom_histogram()
+```
 
-ggplot(data, aes(group = RENT, x = FOODSTMP, y = RENT)) +
+Important to notice that most of the people do not receive food stamps.
+
+#### Relationship between rent and receiving foodstamps
+```{r}
+ggplot(data, aes(y = RENT, x = as.factor(FOODSTMP))) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(data, aes(y = PERWT, x = as.factor(FOODSTMP))) +
+  geom_boxplot()
+```
+#### Relationship between transit time and receiving foodstamps
+```{r}
+ggplot(data, aes(y = TRANTIME, x = as.factor(FOODSTMP))) +
   geom_boxplot()
 ```
 
@@ -54,9 +67,6 @@ ggplot(data, aes(group = RENT, x = FOODSTMP, y = RENT)) +
 ##LOGISTIC REGRESSION
 
 ```{r}
-data <- data %>%
-      mutate(FOODSTMP = ifelse(FOODSTMP == 1,0,1))
-
 glm_fit = glm(FOODSTMP~.,
               data = data,
               family = binomial)

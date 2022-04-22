@@ -124,28 +124,5 @@ glm_pred %>%
 # Logistic Regression 
 We performed a logistic regression 
 
-# Random Forest
-```{r}
-library(randomForest)
-set.seed(1)
-```
-
-# Model
-```{r}
-rf_model <- randomForest(FOODSTMP~.,
-                         data = train,
-                         mtry = 6,
-                         importance = TRUE
-                         )
-
-rf_boston = randomForest(medv~., 
-                         data = boston_train, 
-                         mtry = 6, 
-                         importance = TRUE)
-
-random_forest_estimate = predict(rf_boston, 
-                                 newdata = boston_test)
-
-mean((random_forest_estimate - boston_test$medv)^2)
-```
+#Trees 
 

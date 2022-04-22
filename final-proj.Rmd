@@ -38,6 +38,8 @@ Questions for Sanogo:
 - What are all the model choosing methods we could use? We were thinking of using CV and lasso. Tuning for trees?
 - Feedback on research question.
 
+-Trees: random forests, boosting methods --> either will work, but look up the goals we want to focus on 
+
 ##PART 1: EXPLORATORY DATA ANALYSIS
 
 ```{r}

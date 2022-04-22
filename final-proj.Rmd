@@ -123,3 +123,7 @@ glm_pred %>%
 
 ##PART 2: METHODS 
 
+# Logistic Regression 
+We performed a logistic regression 
+#Trees 
+

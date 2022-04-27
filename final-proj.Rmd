@@ -5,10 +5,12 @@ date: "4/10/2022"
 output: html_document
 ---
 
+## LOAD PACKAGES
 ```{r include=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(randomForest)
+library(ggcorrplot)
 
 set.seed(1)
 ```
@@ -16,12 +18,11 @@ set.seed(1)
 ## LOAD DATA
 ```{r}
 data <- read.csv("colorado_housing_data.csv") %>%
-  mutate(FOODSTMP = as.factor(ifelse(FOODSTMP == 1, 0, 1))) %>%
+  mutate(FOODSTMP = as.factor(ifelse(FOODSTMP == 1, 1, 0))) %>%
   select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD))
 ```
 
-
-##QUESTION 
+## QUESTION 
 What are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
 
 Which variables will predict the likelihood of someone receiving food stamps or not in Colorado?
@@ -31,81 +32,109 @@ Questions for Sanogo:
 - What are all the model choosing methods we could use? We were thinking of using CV and lasso. Tuning for trees?
 - Feedback on research question.
 
-##PART 1: EXPLORATORY DATA ANALYSIS
+## PART 1: EXPLORATORY DATA ANALYSIS
 
+### Variable list
+- `RENT`: Monthly contract rent  
+- `FOODSTMP`: Food stamp recipiency  
+- `VALUEH`: House value  
+- `RACNUM`: Number of major race groups  
+- `HCOVANY`: Any health insurance coverage  
+- `HCOVPUB`: Public health insurance coverage  
+- `HINSIHS`: Health insurance through Indian Health Services  
+- `EMPSTAT`: Employment status  
+- `OCC`: Occupation  
+- `VETSTAT`: Veteran status  
+- `TRANWORK`: Means of transportation to work  
+- `TRANTIME`: Travel time to work  
+
+### Summary of data
 ```{r}
-ggplot(data, aes(x = FOODSTMP)) +
-  geom_histogram()
+summary(data)
 ```
 
-Important to notice that most of the people do not receive food stamps.
+### Distribution of response variable
+```{r}
+count <- data %>%
+  group_by(FOODSTMP) %>%
+  summarise(total = n())
+
+ggplot(count, aes(x = FOODSTMP, y = total, fill = FOODSTMP)) +
+  geom_col(show.legend = FALSE) +
+  geom_label(aes(label = total), show.legend = FALSE)
+```
+
+Important to notice that most of the people receive food stamps.
 
 #### Relationship between rent and receiving foodstamps
 ```{r}
-ggplot(data, aes(y = RENT, x = as.factor(FOODSTMP))) +
+ggplot(data, aes(y = RENT, x = FOODSTMP)) +
   geom_boxplot()
 ```
 
-```{r}
-ggplot(data, aes(y = PERWT, x = as.factor(FOODSTMP))) +
-  geom_boxplot()
-```
 #### Relationship between transit time and receiving foodstamps
 ```{r}
-ggplot(data, aes(y = TRANTIME, x = as.factor(FOODSTMP))) +
+ggplot(data, aes(y = TRANTIME, x = FOODSTMP)) +
   geom_boxplot()
 ```
 
+#### Correlation of variables
 ```{r}
-ggplot(data, aes(x = FOODSTMP)) +
-  geom_bar()
+model.matrix(~0+., data = data) %>%
+  cor(use = "pairwise.complete.obs") %>%
+  ggcorrplot(lab = TRUE, lab_size = 2)
+```
+Notes: Rent and house value are pretty correlated.
+
+## PART 2: METHODOLOGY
+We split the data into a training set and a testing set.
+
+```{r}
+train <- data %>%
+  dplyr::sample_frac(0.8)
+
+test <- data %>%
+  anti_join(train)
 ```
 
 
+### MODEL 1: LOGISTIC REGRESSION
 
+We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and resposne.
 
-##LOGISTIC REGRESSION
+#### Model for entire dataset
 
 ```{r}
-glm_fit = glm(FOODSTMP~.,
+glm_fit <- glm(FOODSTMP~.,
               data = data,
               family = binomial)
 summary(glm_fit)
 ```
 
 ```{r}
-glm_probs = data.frame(probs = predict(glm_fit, type="response"))
+glm_probs <- data.frame(probs = predict(glm_fit, type="response"))
 head(glm_probs)
 ```
 
-```{r}
-set.seed(1)
-
-train = data %>%
-  dplyr::sample_frac(0.8)
-
-test = data %>%
-  anti_join(train)
-```
+#### Training model
 
 ```{r}
-glm_2 = glm(FOODSTMP~.,
-              data = train, family = binomial)
+glm_2 <- glm(FOODSTMP~., data = train, family = binomial)
 summary(glm_2)
 ```
 
 ```{r}
-glm_probs2 = data.frame(probs = predict(glm_2, newdata = test, type="response"))
+glm_probs2 <- data.frame(probs = predict(glm_2, newdata = test, type="response"))
 head(glm_probs2)
 ```
 
 ```{r}
 #create probabilities
 
-glm_pred = glm_probs2 %>%
+glm_pred <- glm_probs2 %>%
   mutate(pred = ifelse(probs>.5, "No", "Yes"))
 
-glm_pred = cbind(test, glm_pred)
+glm_pred <- cbind(test, glm_pred)
 
 glm_pred %>% 
   count(pred, FOODSTMP) %>%
@@ -115,43 +144,31 @@ glm_pred %>%
   summarize(score = mean(pred == FOODSTMP))
 ```
 
-##CROSS VALIDATION TO SUBSET PREDICTORS
+### MODEL 2: BAGGING
 
-
-
-## PART 2: METHODS 
-
-# Logistic Regression 
-We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and resposne. 
-
-# Bagging 
 Based on recommendations from Professor Sanogo, we decided to also use tree based methods for its interpretability and because our dataset has many predictors. We decided on bagging because it reduces variance in our data. 
 
 Is the computational power worth it?? 
 
 
-# Bagging Model 
+#### Bagging Model 
 https://discuss.analyticsvidhya.com/t/what-does-the-warning-the-response-has-five-or-fewer-unique-values-while-building-random-forest-mean/6442
 
 ```{r}
-rf_model <- randomForest(FOODSTMP~.,
+bagging_model <- randomForest(FOODSTMP~.,
                          data = train,
                          mtry = 11,
                          importance = TRUE
                          )
 
-# rf_boston = randomForest(medv~., 
-#                          data = boston_train, 
-#                          mtry = 6, 
-#                          importance = TRUE)
-# 
-# random_forest_estimate = predict(rf_boston, 
-#                                  newdata = boston_test)
-# 
-# mean((random_forest_estimate - boston_test$medv)^2)
-
-summary(rf_model)
+summary(bagging_model)
 ```
+
+```{r}
+bagging_estimate <- predict(bagging_model, newdata = train)
+mean((bagging_estimate - test$FOODSTMP)^2)
+```
+
 
 ## PART 3: KEY TAKEAWAYS 
 

@@ -20,7 +20,7 @@ set.seed(1)
 ```{r}
 data <- read.csv("colorado_housing_data.csv") %>%
   mutate(FOODSTMP = as.factor(ifelse(FOODSTMP == 1, 1, 0))) %>%
-  select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD))
+  select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD, HCOVANY, HINSIHS))
 ```
 
 ## QUESTION 
@@ -40,9 +40,7 @@ Questions for Sanogo:
 - `FOODSTMP`: Food stamp recipiency  
 - `VALUEH`: House value  
 - `RACNUM`: Number of major race groups  
-- `HCOVANY`: Any health insurance coverage  
-- `HCOVPUB`: Public health insurance coverage  
-- `HINSIHS`: Health insurance through Indian Health Services  
+- `HCOVPUB`: Public health insurance coverage   
 - `EMPSTAT`: Employment status  
 - `OCC`: Occupation  
 - `VETSTAT`: Veteran status  
@@ -162,7 +160,7 @@ https://discuss.analyticsvidhya.com/t/what-does-the-warning-the-response-has-fiv
 ```{r}
 # bagging_model <- randomForest(FOODSTMP~.,
 #                          data = train,
-#                          mtry = 11,
+#                          mtry = 9,
 #                          importance = TRUE
 #                          )
 # 
@@ -174,8 +172,17 @@ summary(bagging_model)
 ```
 
 ```{r}
-bagging_estimate <- predict(bagging_model, newdata = train)
-mean((bagging_estimate - test$FOODSTMP)^2)
+bagging_estimate <- predict(bagging_model, newdata = test)
+
+mean(test$FOODSTMP == bagging_estimate) # accuracy rate
+
+table(test$FOODSTMP, bagging_estimate) # confusion matrix
+```
+
+```{r}
+importance(bagging_model)
+
+varImpPlot(bagging_model)
 ```
 
 

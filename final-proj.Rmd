@@ -9,10 +9,13 @@ output: html_document
 ```{r include=FALSE}
 library(tidyverse)
 library(ggplot2)
-library(randomForest)
 library(ggcorrplot)
 
 set.seed(1)
+library(randomForest)
+
+
+
 ```
 
 ## LOAD DATA
@@ -62,7 +65,9 @@ count <- data %>%
 ggplot(count, aes(x = FOODSTMP, y = total, fill = FOODSTMP)) +
   geom_col(show.legend = FALSE) +
   geom_label(aes(label = total), show.legend = FALSE)
+  
 ```
+Figure 1. The majority of people in this dataset (53319) received foodstamps in 2019 whereas only 3823 people do not receive foodstamps in that same year. 
 
 Important to notice that most of the people receive food stamps.
 
@@ -71,12 +76,14 @@ Important to notice that most of the people receive food stamps.
 ggplot(data, aes(y = RENT, x = FOODSTMP)) +
   geom_boxplot()
 ```
+Figure 2. Individuals who receive foodstamps tend to have a lower average rent than the individuals who do not receive food stamps. Additionally, the spread in the rent values  is much greater for those with food stamps, than without. 
 
 #### Relationship between transit time and receiving foodstamps
 ```{r}
 ggplot(data, aes(y = TRANTIME, x = FOODSTMP)) +
   geom_boxplot()
 ```
+Figure 3. Those receiving food stamps have a higher transit time on average. However, the spread of the data is similar between both categories. 
 
 #### Correlation of variables
 ```{r}
@@ -84,7 +91,7 @@ model.matrix(~0+., data = data) %>%
   cor(use = "pairwise.complete.obs") %>%
   ggcorrplot(lab = TRUE, lab_size = 2)
 ```
-Notes: Rent and house value are pretty correlated.
+Figure 4. Rent and house value are highly correlated at a value of 0.79. The higher the house value the higher the rent is. Neither food stamp variables are highly correlated with the other variables. The highest correlation value is between Food stamps and HCOVANY which is whether or not someone has public health insurance. This is at a value of 0.25. 
 
 ## PART 2: METHODOLOGY
 We split the data into a training set and a testing set.
@@ -171,4 +178,9 @@ mean((bagging_estimate - test$FOODSTMP)^2)
 
 
 ## PART 3: KEY TAKEAWAYS 
+
+EDA Takeaways: 
+- Healthcare foodstamp correlation/further questions? --> are people even receiving health insurance?
+- Rent/ food stamp --> section 8?
+- 
 

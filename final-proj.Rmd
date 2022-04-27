@@ -124,5 +124,6 @@ glm_pred %>%
 # Logistic Regression 
 We performed a logistic regression 
 
-#Trees 
+# Random Forest
+
 

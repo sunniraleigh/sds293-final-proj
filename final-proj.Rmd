@@ -24,7 +24,8 @@ library(tidyverse)
 ## LOAD DATA
 ```{r}
 data <- read.csv("colorado_housing_data.csv") %>%
-  mutate(FOODSTMP = ifelse(FOODSTMP == 1, 0, 1))
+  mutate(FOODSTMP = as.factor(ifelse(FOODSTMP == 1, 0, 1))) %>%
+  select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD))
 ```
 
 
@@ -124,6 +125,30 @@ glm_pred %>%
 # Logistic Regression 
 We performed a logistic regression 
 
-# Random Forest
+# Random Forest Model
+```{r}
+library(randomForest)
+set.seed(1)
+```
+
+https://discuss.analyticsvidhya.com/t/what-does-the-warning-the-response-has-five-or-fewer-unique-values-while-building-random-forest-mean/6442
+
+```{r}
+rf_model <- randomForest(FOODSTMP~.,
+                         data = train,
+                         mtry = 11,
+                         importance = TRUE
+                         )
+
+# rf_boston = randomForest(medv~., 
+#                          data = boston_train, 
+#                          mtry = 6, 
+#                          importance = TRUE)
+# 
+# random_forest_estimate = predict(rf_boston, 
+#                                  newdata = boston_test)
+# 
+# mean((random_forest_estimate - boston_test$medv)^2)
+```
 
 

@@ -23,17 +23,21 @@ data <- read.csv("colorado_housing_data.csv") %>%
   select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD, HCOVANY, HINSIHS))
 ```
 
-## QUESTION 
-What are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
+## INTRO 
+Food insecurity is a nation wide issue that affects millions of American households every year. The USDA defines it as a lack of consistent access to enough food for an active, healthy life. One of the federal programs implemented in each state, Supplemental Nutrition Assistance Program or SNAP, combats this issue by providing food stamps for those who cannot afford to buy their own food. These stamps can be used in grocery stores on a wide variety of products, including produce, poultry, and dairy. 
 
-Which variables will predict the likelihood of someone receiving food stamps or not in Colorado?
+This exploration of Colorado comes from the fact that Sunni is from there and Amrita volunteers regularly with food insecure individuals in Northampton. Together, we want to ask, what are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
+
+This is an important project because food insecurity is linked to poverty, healthcare inaccess and housing insecurity, among other issues. By running these analyses we can start to see the relationships between food insecurity and other problems in the state of Colorado. 
+
+We created our own data extract from IPUMS, a data source that contains census and survey data across the country over various spans of time. We extracted data from the year 2019 in the state of Colorado, and chose various demographic characteristics we were interested in to understand this issue. 
+
+The variables we chose are as follow in this table and key. 
 
 Questions for Sanogo:
 - We're interested in tree and logit regression for models, what are some other models we could use for classification?  
 - What are all the model choosing methods we could use? We were thinking of using CV and lasso. Tuning for trees?
 - Feedback on research question.
-
-## PART 1: EXPLORATORY DATA ANALYSIS
 
 ### Variable list
 - `RENT`: Monthly contract rent  
@@ -51,6 +55,9 @@ Questions for Sanogo:
 ```{r}
 summary(data)
 ```
+
+## PART 1: EXPLORATORY DATA ANALYSIS
+
 
 ### Distribution of response variable
 ```{r}

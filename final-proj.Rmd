@@ -185,9 +185,9 @@ Our bagging model has an accuracy rate of 92%. The most important variables for 
 
 ## PART 3: KEY TAKEAWAYS 
 
-EDA Takeaways: 
-- Healthcare foodstamp correlation/further questions? --> are people even receiving health insurance?
-- Rent/ food stamp --> section 8?
+We were intrigued by the EDA graphics and have further questions about various components of our dataset. First, after looking out our correlation plot it became clear that the variable for people getting public health insurance is not very highly correlated with somebody getting foodstamps. Through our background knowledge of public policy and economics, we know that often people who get one publicly funded resource often rely on others, so we question, is there a low correlation because people simply aren't getting health insurance? We'd need to dig further into Colorado's public health insurance policies and statistics on those who receive health insurance in order to draw any conclusions. 
+
+In addition, we noticed in our rent and food stamps box plot that although individuals who receive food stamps have a lower mean rent, there is still a large spread of rent values that is similar to those who do not receive food stamps. This makes us question where the gap in that data could come from. We wonder if individuals on food stamps may be receiving Section 8 housing vouchers where portions of their high rents are being covered by the government. In this way, we'd need to do further research on Colorado affordable housing family in order to draw some conclusions on this lack of correlation. 
 
 The two accuracy rates of our models are very similar with the logit model producing an accuracy rate of 93.2% and the bagging model producing an accuracy rate of 92%. We conclude that a logistic regression models is better to use for our data. While the accuracy rates are very similar and both models have low variance, logistic regression achieves the same as the bagging model but is less computationally intensive and easier to interpret.
 

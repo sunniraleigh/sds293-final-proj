@@ -110,7 +110,7 @@ test <- data %>%
 
 ### MODEL 1: LOGISTIC REGRESSION
 
-We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and resposne.
+We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and response.
 
 #### Model for entire dataset
 

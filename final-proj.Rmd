@@ -13,7 +13,7 @@ library(ggcorrplot)
 
 set.seed(1)
 
-# library(randomForest)
+library(randomForest)
 ```
 
 ## LOAD DATA
@@ -110,7 +110,7 @@ test <- data %>%
 
 ### MODEL 1: LOGISTIC REGRESSION
 
-We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and response.
+We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Because of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and response.
 
 #### Model for entire dataset
 
@@ -141,19 +141,18 @@ glm_pred <- glm_probs2 %>% mutate(pred = ifelse(probs > .5, 1, 0))
 
 ```{r}
 mean(test$FOODSTMP == glm_pred$pred)
+
+table(test$FOODSTMP, glm_pred$pred)
 ```
 
 
 ### MODEL 2: BAGGING
 
-Based on recommendations from Professor Sanogo, we decided to also use tree based methods for its interpretability and because our dataset has many predictors. We decided on bagging because it reduces variance in our data. 
+Based on recommendations from Professor Sanogo, we decided to also use tree based methods for its interpretability and because our dataset has many predictors. We decided on bagging because it reduces variance in our data. Additionally, tree models are fun to implement. Bagging combines bootstrapping with random forest models, so our main question when using this model is if the computational work is worth it. We will compare the results of the bagging model to our logistic regression since logistic regression is more straightforward and takes less time.
 
-Is the computational power worth it?? 
-
+Because the model takes a while to run, we saved the output as an object in our workspace and load it in for analysis. This makes the .Rmd knit faster.
 
 #### Bagging Model 
-https://discuss.analyticsvidhya.com/t/what-does-the-warning-the-response-has-five-or-fewer-unique-values-while-building-random-forest-mean/6442
-
 ```{r}
 # bagging_model <- randomForest(FOODSTMP~.,
 #                          data = train,
@@ -182,13 +181,17 @@ importance(bagging_model)
 varImpPlot(bagging_model)
 ```
 
+Our bagging model has an accuracy rate of 92%. The most important variables for the model's accuracy are `HCOVPUB`, `RENT`, `OCC`, `VALUEH`, `VETSTAT`, `RACNUM`, `EMPSTAT`, `TRANTIME`, `TRANWORK`. 
 
 ## PART 3: KEY TAKEAWAYS 
 
 EDA Takeaways: 
 - Healthcare foodstamp correlation/further questions? --> are people even receiving health insurance?
 - Rent/ food stamp --> section 8?
-- 
+
+The two accuracy rates of our models are very similar with the logit model producing an accuracy rate of 93.2% and the bagging model producing an accuracy rate of 92%. We conclude that a logistic regression models is better to use for our data. While the accuracy rates are very similar and both models have low variance, logistic regression achieves the same as the bagging model but is less computationally intensive and easier to interpret.
+
+Based on this analysis, it is clear in this case that a simpler model like logistic regression is more applicable than a complex, costly model like bagging. The simpler, the better!
 
 ## Citations
 

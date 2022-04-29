@@ -110,7 +110,7 @@ test <- data %>%
 
 ### MODEL 1: LOGISTIC REGRESSION
 
-We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Becaues of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and response.
+We performed a logistic regression first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression  because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Logistic regression works well with binary responses.It also has low variance because it assumes a linear relationship between the predictor and response.
 
 #### Model for entire dataset
 
@@ -186,9 +186,9 @@ varImpPlot(bagging_model)
 ## PART 3: KEY TAKEAWAYS 
 
 EDA Takeaways: 
-- Healthcare foodstamp correlation/further questions? --> are people even receiving health insurance?
-- Rent/ food stamp --> section 8?
-- 
+We were intrigued by the EDA graphics and have further questions about various components of our dataset. First, after looking out our correlation plot it became clear that the variable for people getting public health insurance is not very highly correlated with somebody getting foodstamps. Through our background knowledge of public policy and economics, we know that often people who get one publicly funded resource often rely on others, so we question, is there a low correlation because people simply aren't getting health insurance? We'd need to dig further into Colorado's public health insurance policies and statistics on those who receive health insurance in order to draw any conclusions. 
+
+In addition, we noticed in our rent and food stamps box plot that although individuals who receive food stamps have a lower mean rent, there is still a large spread of rent values that is similar to those who do not receive food stamps. This makes us question where the gap in that data could come from. We wonder if individuals on food stamps may be receiving Section 8 housing vouchers where portions of their high rents are being covered by the government. In this way, we'd need to do further research on Colorado affordable housing family in order to draw some conclusions on this lack of correlation. 
 
 ## Citations
 

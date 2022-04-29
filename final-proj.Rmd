@@ -59,7 +59,7 @@ summary(data)
 
 
 ### Distribution of response variable
-```{r, fig.cap="Figure 1. The majority of people in this dataset (53319) received foodstamps in 2019 whereas only 3823 people do not receive foodstamps in that same year."}
+```{r, fig.cap="The majority of people in this dataset (53319) received foodstamps in 2019 whereas only 3823 people do not receive foodstamps in that same year."}
 count <- data %>%
   group_by(FOODSTMP) %>%
   summarise(total = n())
@@ -71,19 +71,19 @@ ggplot(count, aes(x = FOODSTMP, y = total, fill = FOODSTMP)) +
 ```
 
 #### Relationship between rent and receiving foodstamps
-```{r, fig.cap="Figure 2. Individuals who receive foodstamps tend to have a lower average rent than the individuals who do not receive food stamps. Additionally, the spread in the rent values  is much greater for those with food stamps, than without."}
+```{r, fig.cap="Individuals who receive foodstamps tend to have a lower average rent than the individuals who do not receive food stamps. Additionally, the spread in the rent values  is much greater for those with food stamps, than without."}
 ggplot(data, aes(y = RENT, x = FOODSTMP)) +
   geom_boxplot()
 ```
 
 #### Relationship between transit time and receiving foodstamps
-```{r, fig.cap=Figure 3. Those receiving food stamps have a higher transit time on average. However, the spread of the data is similar between both categories."}
+```{r, fig.cap="Those receiving food stamps have a higher transit time on average. However, the spread of the data is similar between both categories."}
 ggplot(data, aes(y = TRANTIME, x = FOODSTMP)) +
   geom_boxplot()
 ```
 
 #### Correlation of variables
-```{r, fig.cap="Figure 4. Rent and house value are highly correlated at a value of 0.79. The higher the house value the higher the rent is. Neither food stamp variables are highly correlated with the other variables. The highest correlation value is between Food stamps and HCOVANY which is whether or not someone has public health insurance. This is at a value of 0.25."}
+```{r, fig.cap="Rent and house value are highly correlated at a value of 0.79. The higher the house value the higher the rent is. Neither food stamp variables are highly correlated with the other variables. The highest correlation value is between Food stamps and HCOVANY which is whether or not someone has public health insurance. This is at a value of 0.25."}
 model.matrix(~0+., data = data) %>%
   cor(use = "pairwise.complete.obs") %>%
   ggcorrplot(lab = TRUE, lab_size = 2)

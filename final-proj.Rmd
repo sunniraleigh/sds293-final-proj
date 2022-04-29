@@ -1,29 +1,33 @@
 ---
-title: "Final Project"
+title: 'Who''s Hungry: Addressing Colorado''s Food Stamp Recipients'
 author: "Amrita Acharya & Sunni Raleigh"
 date: "4/10/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-## LOAD PACKAGES
 ```{r include=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(ggcorrplot)
+library(randomForest)
+
+library(devtools)
+devtools::install_github("cardiomoon/ggiraphExtra")
+library(ggiraphExtra)
 
 set.seed(1)
-
-library(randomForest)
 ```
 
-## LOAD DATA
+## Load Data
 ```{r}
 data <- read.csv("colorado_housing_data.csv") %>%
   mutate(FOODSTMP = as.factor(ifelse(FOODSTMP == 1, 1, 0))) %>%
   select(-c(X, YEAR, HHWT, CLUSTER, GQ, STATEFIP, STRATA, PERNUM, PERWT, EMPSTATD, VETSTATD, HCOVANY, HINSIHS))
 ```
 
-## INTRO 
+## Introduction
 Food insecurity is a nation wide issue that affects millions of American households every year. The USDA defines it as a lack of consistent access to enough food for an active, healthy life. One of the federal programs implemented in each state, Supplemental Nutrition Assistance Program or SNAP, combats this issue by providing food stamps for those who cannot afford to buy their own food. These stamps can be used in grocery stores on a wide variety of products, including produce, poultry, and dairy. 
 
 This exploration of Colorado comes from the fact that Sunni is from there and Amrita volunteers regularly with food insecure individuals in Northampton. Together, we want to ask, what are the most important determinants for someone to be eligible for food stamps in the state of Colorado? 
@@ -33,11 +37,6 @@ This is an important project because food insecurity is linked to poverty, healt
 We created our own data extract from IPUMS, a data source that contains census and survey data across the country over various spans of time. We extracted data from the year 2019 in the state of Colorado, and chose various demographic characteristics we were interested in to understand this issue. 
 
 The variables we chose are as follow in this table and key. 
-
-Questions for Sanogo:
-- We're interested in tree and logit regression for models, what are some other models we could use for classification?  
-- What are all the model choosing methods we could use? We were thinking of using CV and lasso. Tuning for trees?
-- Feedback on research question.
 
 ### Variable list
 - `RENT`: Monthly contract rent  
@@ -56,11 +55,11 @@ Questions for Sanogo:
 summary(data)
 ```
 
-## PART 1: EXPLORATORY DATA ANALYSIS
+## PART 1: Exploratory Data Analysis
 
 
 ### Distribution of response variable
-```{r}
+```{r, fig.cap="Figure 1. The majority of people in this dataset (53319) received foodstamps in 2019 whereas only 3823 people do not receive foodstamps in that same year."}
 count <- data %>%
   group_by(FOODSTMP) %>%
   summarise(total = n())
@@ -70,33 +69,27 @@ ggplot(count, aes(x = FOODSTMP, y = total, fill = FOODSTMP)) +
   geom_label(aes(label = total), show.legend = FALSE)
   
 ```
-Figure 1. The majority of people in this dataset (53319) received foodstamps in 2019 whereas only 3823 people do not receive foodstamps in that same year. 
-
-Important to notice that most of the people receive food stamps.
 
 #### Relationship between rent and receiving foodstamps
-```{r}
+```{r, fig.cap="Figure 2. Individuals who receive foodstamps tend to have a lower average rent than the individuals who do not receive food stamps. Additionally, the spread in the rent values  is much greater for those with food stamps, than without."}
 ggplot(data, aes(y = RENT, x = FOODSTMP)) +
   geom_boxplot()
 ```
-Figure 2. Individuals who receive foodstamps tend to have a lower average rent than the individuals who do not receive food stamps. Additionally, the spread in the rent values  is much greater for those with food stamps, than without. 
 
 #### Relationship between transit time and receiving foodstamps
-```{r}
+```{r, fig.cap=Figure 3. Those receiving food stamps have a higher transit time on average. However, the spread of the data is similar between both categories."}
 ggplot(data, aes(y = TRANTIME, x = FOODSTMP)) +
   geom_boxplot()
 ```
-Figure 3. Those receiving food stamps have a higher transit time on average. However, the spread of the data is similar between both categories. 
 
 #### Correlation of variables
-```{r}
+```{r, fig.cap="Figure 4. Rent and house value are highly correlated at a value of 0.79. The higher the house value the higher the rent is. Neither food stamp variables are highly correlated with the other variables. The highest correlation value is between Food stamps and HCOVANY which is whether or not someone has public health insurance. This is at a value of 0.25."}
 model.matrix(~0+., data = data) %>%
   cor(use = "pairwise.complete.obs") %>%
   ggcorrplot(lab = TRUE, lab_size = 2)
 ```
-Figure 4. Rent and house value are highly correlated at a value of 0.79. The higher the house value the higher the rent is. Neither food stamp variables are highly correlated with the other variables. The highest correlation value is between Food stamps and HCOVANY which is whether or not someone has public health insurance. This is at a value of 0.25. 
 
-## PART 2: METHODOLOGY
+## PART 2: Methodology
 We split the data into a training set and a testing set.
 
 ```{r}
@@ -108,7 +101,7 @@ test <- data %>%
 ```
 
 
-### MODEL 1: LOGISTIC REGRESSION
+### Model 1: Logistic Regression
 
 We performed a logistic regression on our data first to understand the probabilities of someone getting food stamps in Colorado. We wanted to use logistic regression first because it is easy to interpret for the sake of this research project, and it is a model we are very familiar with. Our food stamp variable FOODSTMP has a binary response, either 0, not receiving food stamps, or 1, receiving food stamps. Because of this, we decided on logistic regression because it works with binary responses. Logistic regression also has low variance because it assumes a linear relationship between the predictor and response.
 
@@ -146,11 +139,11 @@ table(test$FOODSTMP, glm_pred$pred)
 ```
 
 
-### MODEL 2: BAGGING
+### Model 2: Bagging
 
 Based on recommendations from Professor Sanogo, we decided to also use tree based methods for its interpretability and because our dataset has many predictors. We decided on bagging because it reduces variance in our data. Additionally, tree models are fun to implement. Bagging combines bootstrapping with random forest models, so our main question when using this model is if the computational work is worth it. We will compare the results of the bagging model to our logistic regression since logistic regression is more straightforward and takes less time.
 
-Because the model takes a while to run, we saved the output as an object in our workspace and load it in for analysis. This makes the .Rmd knit faster.
+The argument `mtry` is equal to 9 because we have 9 predictor variables. Because the model takes a while to run, we saved the output as an object in our workspace and load it in for analysis. This makes the .Rmd knit faster.
 
 #### Bagging Model 
 ```{r}
@@ -183,11 +176,18 @@ varImpPlot(bagging_model)
 
 Our bagging model has an accuracy rate of 92%. The most important variables for the model's accuracy are `HCOVPUB`, `RENT`, `OCC`, `VALUEH`, `VETSTAT`, `RACNUM`, `EMPSTAT`, `TRANTIME`, `TRANWORK`. 
 
-## PART 3: KEY TAKEAWAYS 
+## PART 3: Key Takeaways
 
 We were intrigued by the EDA graphics and have further questions about various components of our dataset. First, after looking out our correlation plot it became clear that the variable for people getting public health insurance is not very highly correlated with somebody getting foodstamps. Through our background knowledge of public policy and economics, we know that often people who get one publicly funded resource often rely on others, so we question, is there a low correlation because people simply aren't getting health insurance? We'd need to dig further into Colorado's public health insurance policies and statistics on those who receive health insurance in order to draw any conclusions. 
 
 In addition, we noticed in our rent and food stamps box plot that although individuals who receive food stamps have a lower mean rent, there is still a large spread of rent values that is similar to those who do not receive food stamps. This makes us question where the gap in that data could come from. We wonder if individuals on food stamps may be receiving Section 8 housing vouchers where portions of their high rents are being covered by the government. In this way, we'd need to do further research on Colorado affordable housing family in order to draw some conclusions on this lack of correlation. 
+
+We visualize a logistic regression with the 3 most important predictors determined by the bagging model. For each occupations, we see that people are less likely to receive food stamps when their rent is higher.
+```{r message=FALSE, warning=FALSE}
+glm_viz <- glm(FOODSTMP ~ RENT + HCOVPUB + OCC, data = data, family = binomial)
+
+ggPredict(glm_viz, colorn = 3, point = FALSE, jitter = FALSE)
+```
 
 The two accuracy rates of our models are very similar with the logit model producing an accuracy rate of 93.2% and the bagging model producing an accuracy rate of 92%. We conclude that a logistic regression models is better to use for our data. While the accuracy rates are very similar and both models have low variance, logistic regression achieves the same as the bagging model but is less computationally intensive and easier to interpret.
 

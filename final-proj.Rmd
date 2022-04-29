@@ -200,3 +200,11 @@ EDA Takeaways:
 - Rent/ food stamp --> section 8?
 - 
 
+## Citations
+
+- https://usa.ipums.org/usa/
+- http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2
+- https://stackoverflow.com/questions/52554336/plot-the-equivalent-of-correlation-matrix-for-factors-categorical-data-and-mi
+- https://statisticsglobe.com/add-count-labels-on-top-of-ggplot2-barchart-in-r
+- https://stackoverflow.com/questions/14761496/saving-and-loading-a-model-in-r
+
